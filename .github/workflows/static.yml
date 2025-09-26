@@ -6,6 +6,10 @@ on:
   push:
     branches: ['main']
 
+  # 每小时自动同步（可调整频率）
+  schedule:
+    - cron: "0 * * * *" # 每小时执行一次
+
   # 允许手动触发
   workflow_dispatch:
 
