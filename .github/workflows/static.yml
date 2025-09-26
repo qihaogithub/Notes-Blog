@@ -1,0 +1,53 @@
+name: Sync Notes & Deploy
+
+on:
+  # 每小时自动同步（可调整频率）
+  schedule:
+    - cron: "0 * * * *" # 每小时执行一次
+
+  # 手动触发（可选）
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 检出博客主仓库（空仓库）
+      - name: Checkout main repo
+        uses: actions/checkout@v3
+
+      # 2. 检出笔记仓库（关键！）
+      - name: Checkout notes repository
+        uses: actions/checkout@v3
+        with:
+          repository: qh2/notes # 替换为你的笔记仓库
+          ref: main # 笔记仓库分支
+          path: temp-notes # 本地存放路径
+          token: ${{ secrets.NOTE_REPO_TOKEN }} # 从Secrets读取
+
+      # 3. 如果笔记仓库有子目录（如notes/），需复制内容
+      - name: Copy notes content
+        if: steps.checkout-notes.outputs.tree != 'empty'
+        run: |
+          # 笔记仓库的Markdown文件直接在根目录下，无需复制
+          echo "Notes are already in temp-notes directory"
+
+      # 4. 生成静态页面
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build static site
+        run: npm run build
+
+      # 5. 部署到GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
