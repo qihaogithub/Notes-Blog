@@ -39,6 +39,7 @@ jobs:
           ref: main
           path: temp-notes
           token: ${{ secrets.NOTE_REPO_TOKEN }}
+          persist-credentials: false
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
