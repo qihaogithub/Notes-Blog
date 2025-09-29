@@ -35,7 +35,7 @@ jobs:
       - name: 检出笔记仓库
         uses: actions/checkout@v4
         with:
-          repository: qh2/notes
+          repository: qihaogithub/Notes
           ref: main
           path: temp-notes
           token: ${{ secrets.NOTE_REPO_TOKEN }}
